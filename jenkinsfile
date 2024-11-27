@@ -15,6 +15,7 @@ pipeline {
         }
         stage("DOCKER") {
             steps {
+            echo"test"
                 sh "docker -v" 
                 
             }
