@@ -1,0 +1,23 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                
+                git 'https://github.com/amal774/GHARBI.git'
+            }
+        }
+        stage('Build Project') {
+            steps {
+                sh 'mvn clean'
+            }
+        }
+        stage("DOCKER") {
+            steps {
+                sh "docker --version" 
+                
+            }
+        }
+    }
+}
