@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'votre-utilisateur-dockerhub/nom-image'
+        DOCKER_IMAGE = 'amal311/imagedocker'
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
     }
 
