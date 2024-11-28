@@ -4,6 +4,8 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'amal311/imagedocker'
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
+        SONARQUBE_URL = 'http://localhost:9000'
+        SONARQUBE_TOKEN = credentials('sonar-token')  // Remplace par le nom de ton credential Jenkins
     }
 
     stages {
@@ -16,6 +18,17 @@ pipeline {
         stage('Build Project2') {
             steps {
                 sh 'mvn package'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Exécution de l'analyse SonarQube avec Maven
+                    sh """
+                    mvn sonar:sonar -Dsonar.projectKey=GHARBI_PROJECT -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${SONARQUBE_TOKEN}
+                    """
+                }
             }
         }
 
