@@ -23,12 +23,10 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                script {
-                    // Exécution de l'analyse SonarQube avec Maven
-                    sh """
+                // Correction ici : utilisation correcte des variables et des paramètres
+                sh """
                     mvn sonar:sonar -Dsonar.projectKey=GHARBI_PROJECT -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${SONARQUBE_TOKEN}
-                    """
-                }
+                """
             }
         }
 
