@@ -15,7 +15,7 @@ pipeline {
             }
         }
 
-        stage('Build Project2') {
+        stage('Build Project3') {
             steps {
                 sh 'mvn package'
             }
@@ -23,10 +23,8 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                // Correction ici : utilisation correcte des variables et des paramètres
-                sh """
-                    mvn sonar:sonar -Dsonar.projectKey=GHARBI_PROJECT -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${SONARQUBE_TOKEN}
-                """
+               
+                   sh "mvn sonar:sonar -Dsonar.projectKey=GHARBI_PROJECT -Dsonar.host.url=${SONARQUBE_URL} Dsonar.login={SONARQUBE_TOKEN}"    
             }
         }
 
