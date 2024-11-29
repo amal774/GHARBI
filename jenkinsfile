@@ -6,8 +6,7 @@ pipeline {
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
         SONARQUBE_URL = 'http://localhost:9000'
         SONARQUBE_TOKEN = credentials('sonar-token')  // Remplace par le nom de ton credential Jenkins
-        NEXUS_USERNAME = credentials('nexus')  // Utilisation du credential "nexus" pour récupérer le nom d'utilisateur
-        NEXUS_PASSWORD = credentials('nexus')  // Utilisation du credential "nexus" pour récupérer le mot de passe
+        NEXUS_CREDENTIALS = credentials('nexus')  // Utilisation du credential "nexus" pour récupérer le nom d'utilisateur
         NEXUS_URL = 'http://localhost:8081'  // URL de votre Nexus
         NEXUS_REPO = 'nexusproject'  // Nom du repository Nexus où vous souhaitez publier l'artefact
         ARTIFACT_GROUP = 'testnexus'  // Le group ID de votre artefact
@@ -63,16 +62,17 @@ pipeline {
 
         stage('Publish Artifact to Nexus') {
             steps {
-                script {
+                 withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_CREDENTIALS_USR', passwordVariable: 'NEXUS_CREDENTIALS_PSW')]){
                     // Publier l'artefact vers Nexus (par exemple un fichier .jar)
                     sh """
-                        curl -v -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} \
+                        curl -v -u ${NEXUS_CREDENTIALS_USR}:${NEXUS_CREDENTIALS_PSW} \
                              --upload-file target/Devops-${BUILD_NUMBER}.jar \
                              ${NEXUS_URL}/repository/${NEXUS_REPO}/${ARTIFACT_GROUP.replace('.', '/')}/${ARTIFACT_NAME}/${ARTIFACT_VERSION}/${ARTIFACT_NAME}-${BUILD_NUMBER}.jar
                     """
-                }
+                
+            }
             }
         }
-    }
+    
 }
 
