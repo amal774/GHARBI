@@ -5,13 +5,13 @@ pipeline {
         DOCKER_IMAGE = 'amal311/imagedocker'
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
         SONARQUBE_URL = 'http://localhost:9000'
-        SONARQUBE_TOKEN = credentials('sonar-token')  // Remplace par le nom de ton credential Jenkins
-        NEXUS_CREDENTIALS = credentials('nexus')  // Utilisation du credential "nexus" pour récupérer le nom d'utilisateur
-        NEXUS_URL = 'http://localhost:8081'  // URL de votre Nexus
-        NEXUS_REPO = 'nexusproject'  // Nom du repository Nexus où vous souhaitez publier l'artefact
-        ARTIFACT_GROUP = 'testnexus'  // Le group ID de votre artefact
-        ARTIFACT_NAME = 'Devops'  // Nom de l'artefact
-        ARTIFACT_VERSION = '1.0.0'  // Version de l'artefact
+        SONARQUBE_TOKEN = credentials('sonar-token')  // Replace with your Jenkins credential name for SonarQube
+        NEXUS_CREDENTIALS = 'nexus'  // Jenkins credential for Nexus
+        NEXUS_URL = 'http://localhost:8081'  // URL of your Nexus
+        NEXUS_REPO = 'nexusproject'  // Nexus repository name
+        ARTIFACT_GROUP = 'testnexus'  // Artifact group ID
+        ARTIFACT_NAME = 'Devops'  // Artifact name
+        ARTIFACT_VERSION = '1.0.0'  // Artifact version
     }
 
     stages {
@@ -29,8 +29,13 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                // Analyse SonarQube avec le token d'authentification
-                sh "mvn sonar:sonar -Dsonar.projectKey=GHARBI_PROJECT -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${SONARQUBE_TOKEN}"    
+                // SonarQube analysis with the authentication token
+                sh """
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=GHARBI_PROJECT \
+                    -Dsonar.host.url=${SONARQUBE_URL} \
+                    -Dsonar.login=${SONARQUBE_TOKEN}
+                """
             }
         }
 
@@ -43,17 +48,17 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                // Construction de l'image Docker
+                // Build the Docker image
                 sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                // Push de l'image Docker sur DockerHub
+                // Push Docker image to DockerHub
                 withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh """
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        echo "\$DOCKER_PASS" | docker login -u "\$DOCKER_USER" --password-stdin
                         docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
                     """
                 }
@@ -62,17 +67,16 @@ pipeline {
 
         stage('Publish Artifact to Nexus') {
             steps {
-                 withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_CREDENTIALS_USR', passwordVariable: 'NEXUS_CREDENTIALS_PSW')]){
-                    // Publier l'artefact vers Nexus (par exemple un fichier .jar)
+                withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS, usernameVariable: 'NEXUS_CREDENTIALS_USR', passwordVariable: 'NEXUS_CREDENTIALS_PSW')]) {
+                    // Publish the artifact to Nexus repository
                     sh """
                         curl -v -u ${NEXUS_CREDENTIALS_USR}:${NEXUS_CREDENTIALS_PSW} \
-                             --upload-file target/Devops-${BUILD_NUMBER}.jar \
-                             ${NEXUS_URL}/repository/${NEXUS_REPO}/${ARTIFACT_GROUP.replace('.', '/')}/${ARTIFACT_NAME}/${ARTIFACT_VERSION}/${ARTIFACT_NAME}-${BUILD_NUMBER}.jar
+                        --upload-file target/Devops-${BUILD_NUMBER}.jar \
+                        ${NEXUS_URL}/repository/${NEXUS_REPO}/${ARTIFACT_GROUP.replace('.', '/')}/${ARTIFACT_NAME}/${ARTIFACT_VERSION}/${ARTIFACT_NAME}-${BUILD_NUMBER}.jar
                     """
-                
-            }
+                }
             }
         }
-    
+    }
 }
 
