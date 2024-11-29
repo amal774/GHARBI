@@ -6,12 +6,6 @@ pipeline {
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
         SONARQUBE_URL = 'http://localhost:9000'
         SONARQUBE_TOKEN = credentials('sonar-token')  // Replace with your Jenkins credential name for SonarQube
-        NEXUS_CREDENTIALS = 'nexus'  // Jenkins credential for Nexus
-        NEXUS_URL = 'http://localhost:8081'  // URL of your Nexus
-        NEXUS_REPO = 'nexusproject'  // Nexus repository name
-        ARTIFACT_GROUP = 'testnexus'  // Artifact group ID
-        ARTIFACT_NAME = 'ExamThourayaS2'  // Artifact name
-        ARTIFACT_VERSION = '1.0.0'  // Artifact version
     }
 
     stages {
@@ -62,17 +56,6 @@ pipeline {
                     sh """
                         echo "\$DOCKER_PASS" | docker login -u "\$DOCKER_USER" --password-stdin
                         docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
-                    """
-                }
-            }
-        }
-
-        stage('Publish Artifact to Nexus') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS, usernameVariable: 'NEXUS_CREDENTIALS_USR', passwordVariable: 'NEXUS_CREDENTIALS_PSW')]) {
-                    // Publish the artifact to Nexus repository
-                    sh """
-                        curl -u \$NEXUS_CREDENTIALS_USR:\$NEXUS_CREDENTIALS_PSW --upload-file target/${ARTIFACT_NAME}.jar "${NEXUS_URL}/repository/${NEXUS_REPO}/${ARTIFACT_GROUP.replace('.', '/')}/${ARTIFACT_NAME}/${ARTIFACT_VERSION}/${ARTIFACT_NAME}-${BUILD_NUMBER}.jar"
                     """
                 }
             }
