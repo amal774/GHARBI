@@ -73,7 +73,7 @@ pipeline {
                     		def groupId = 'com.example'
                     		def artifactId = 'my-project'
                     		def version = '1.0.0'
-                    		sh """curl -u $NEXUS_USER:$NEXUS_PASSWORD --upload-file $file \ $NEXUS_URL/repository/$NEXUS_REPO/$groupId/$artifactId/$version/$artifactId-$version.jar"""
+                    		sh """curl -u $NEXUS_USER:$NEXUS_PASSWORD --upload-file $file $NEXUS_URL/repository/$NEXUS_REPO/$groupId/$artifactId/$version/$artifactId-$version.jar"""
                 	}
                 }
         }
