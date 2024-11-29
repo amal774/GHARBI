@@ -21,7 +21,7 @@ pipeline {
             }
         }
 
-        stage('Build Project4') {
+        stage('Build Project') {
             steps {
                 sh 'mvn clean package'
             }
@@ -39,7 +39,7 @@ pipeline {
             }
         }
 
-        stage("DOCKER") {
+        stage("Docker Test") {
             steps {
                 echo "Test Docker"
                 sh "docker -v"
@@ -49,7 +49,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 // Build the Docker image
-                sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
+                sh """
+                    docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .
+                """
             }
         }
 
@@ -70,9 +72,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS, usernameVariable: 'NEXUS_CREDENTIALS_USR', passwordVariable: 'NEXUS_CREDENTIALS_PSW')]) {
                     // Publish the artifact to Nexus repository
                     sh """
-                        curl -v -u ${NEXUS_CREDENTIALS_USR}:${NEXUS_CREDENTIALS_PSW} \
-                        --upload-file target/Devops-${BUILD_NUMBER}.jar \
-                        ${NEXUS_URL}/repository/${NEXUS_REPO}/${ARTIFACT_GROUP.replace('.', '/')}/${ARTIFACT_NAME}/${ARTIFACT_VERSION}/${ARTIFACT_NAME}-${BUILD_NUMBER}.jar
+                        curl -u \$NEXUS_CREDENTIALS_USR:\$NEXUS_CREDENTIALS_PSW --upload-file target/${ARTIFACT_NAME}.jar "${NEXUS_URL}/repository/${NEXUS_REPO}/${ARTIFACT_GROUP.replace('.', '/')}/${ARTIFACT_NAME}/${ARTIFACT_VERSION}/${ARTIFACT_NAME}-${BUILD_NUMBER}.jar"
                     """
                 }
             }
