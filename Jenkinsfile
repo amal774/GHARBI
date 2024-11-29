@@ -58,7 +58,7 @@ pipeline {
         stage('PUSH TO NEXUS') {
         	steps {
         		script {
-                    		def file = 'target/ExamThourayaS2.jar'
+                    		def file = 'target/ExamThourayaS2-0.0.1-SNAPSHOT.jar'
                     		def groupId = 'com.example'
                     		def artifactId = 'my-project'
                     		def version = '1.0.0'
