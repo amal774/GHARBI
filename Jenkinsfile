@@ -15,7 +15,7 @@ pipeline {
             }
         }
 
-        stage('Build Project4') {
+        stage('Build Projectexam') {
             steps {
                 sh 'mvn clean package'
             }
@@ -30,7 +30,7 @@ pipeline {
 
         stage("DOCKER") {
             steps {
-                echo "test"
+                echo "Exam"
                 sh "docker -v"
             }
         }
