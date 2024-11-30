@@ -1,18 +1,18 @@
 pipeline {
     agent any
     environment {
-        NEXUS_URL = '127.0.0.1:8081'
-        NEXUS_REPO = 'nexusproject'
-        NEXUS_USER = 'admin'
-        NEXUS_PASSWORD = 'esprit'
-        DOCKER_IMAGE = 'amal311/imagedocker'
-        DOCKER_CREDENTIALS = 'dockerhub-credentials'
-        SONARQUBE_URL = 'http://localhost:9000'
-        SONARQUBE_TOKEN = credentials('sonar-token')
-        NEXUS_VERSION = '1.0.0'
-        NEXUS_PROTOCOL = 'http'
-        NEXUS_REPOSITORY = 'nexusproject'
-        NEXUS_CREDENTIAL_ID = 'nexus'
+        NEXUS_URL = '127.0.0.1:8081'  // Nexus URL
+        NEXUS_REPO = 'nexusproject'  // Nexus repository name
+        NEXUS_USER = 'admin'  // Nexus username
+        NEXUS_PASSWORD = 'esprit'  // Nexus password (not recommended to hard-code in Jenkinsfile, use credentials)
+        DOCKER_IMAGE = 'amal311/imagedocker'  // Docker image name
+        DOCKER_CREDENTIALS = 'dockerhub-credentials'  // Docker credentials stored in Jenkins
+        SONARQUBE_URL = 'http://localhost:9000'  // SonarQube URL
+        SONARQUBE_TOKEN = credentials('sonar-token')  // SonarQube token credentials
+        NEXUS_VERSION = '1.0.0'  // Version for Nexus upload
+        NEXUS_PROTOCOL = 'http'  // Nexus protocol (http or https)
+        NEXUS_REPOSITORY = 'nexusproject'  // Nexus repository for deployment
+        NEXUS_CREDENTIALS = 'nexus'  // Nexus credentials stored in Jenkins
     }
 
     stages {
@@ -36,7 +36,7 @@ pipeline {
 
         stage("DOCKER") {
             steps {
-                echo "test"
+                echo "Checking Docker version"
                 sh "docker -v"
             }
         }
@@ -57,28 +57,35 @@ pipeline {
                 }
             }
         }
-  
 
         stage('Upload to Nexus') {
             steps {
                 script {
-                    // Uploading the artifact to Nexus
+                    // Upload the artifact to Nexus
                     nexusArtifactUploader(
                         nexusVersion: '3', // Use Nexus 3
-                        protocol: 'http',  // Ensure protocol is correct (http or https)
+                        protocol: "${NEXUS_PROTOCOL}",  // Nexus protocol (http/https)
                         nexusUrl: "${NEXUS_URL}",  // Nexus URL
                         groupId: 'tn.esprit',  // Your project's groupId
-                        version: '0.0.1-SNAPSHOT',  // The version you're deploying
-                        repository: "${NEXUS_REPO}",  // Nexus repository for deployment
+                        version: "${NEXUS_VERSION}",  // Version you're deploying
+                        repository: "${NEXUS_REPOSITORY}",  // Nexus repository for deployment
                         credentialsId: "${NEXUS_CREDENTIALS}",  // Credentials for Nexus access
                         artifacts: [
-                            [artifactId: 'ExamThourayaS2', classifier: '', file: 'target/ExamThourayaS2-0.0.1-SNAPSHOT.jar', type: 'jar'],  // Adjust artifact details
-                            [artifactId: 'ExamThourayaS2', classifier: '', file: 'target/ExamThourayaS2-0.0.1-SNAPSHOT.pom', type: 'pom']  // Ensure POM file is included
+                            [artifactId: 'ExamThourayaS2', classifier: '', file: 'target/ExamThourayaS2-${NEXUS_VERSION}.jar', type: 'jar'],  // Adjust artifact details
+                            [artifactId: 'ExamThourayaS2', classifier: '', file: 'target/ExamThourayaS2-${NEXUS_VERSION}.pom', type: 'pom']  // Ensure POM file is included
                         ]
                     )
                 }
             }
         }
-                }
-            }
-  
+    }
+    post {
+        success {
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            echo 'Build or deployment failed. Please check the logs for errors.'
+        }
+    }
+}
+
