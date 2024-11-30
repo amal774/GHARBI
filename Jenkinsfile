@@ -59,38 +59,26 @@ pipeline {
         }
   
 
-        stage("Publish to Nexus Repository Manager") {
+        stage('Upload to Nexus') {
             steps {
                 script {
-                    pom = readMavenPom file: "pom.xml"
-                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}")
-                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
-                    artifactPath = filesByGlob[0].path
-                    artifactExists = fileExists artifactPath
-                    if(artifactExists) {
-                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}"
-                        nexusArtifactUploader(
-                            nexusVersion: NEXUS_VERSION,
-                            protocol: NEXUS_PROTOCOL,
-                            nexusUrl: NEXUS_URL,
-                            groupId: pom.groupId,
-                            version: pom.version,
-                            repository: NEXUS_REPOSITORY,
-                            credentialsId: NEXUS_CREDENTIAL_ID,
-                            artifacts: [
-                                [artifactId: pom.artifactId,
-                                 classifier: '',
-                                 file: artifactPath,
-                                 type: pom.packaging],
-                                [artifactId: pom.artifactId,
-                                 classifier: '',
-                                 file: "pom.xml",
-                                 type: "pom"]
-                            ]
-                        )
-                    } else {
-                        error "*** File: ${artifactPath}, could not be found"
-                    }
+                    // Uploading the artifact to Nexus
+                    nexusArtifactUploader(
+                        nexusVersion: '3', // Use Nexus 3
+                        protocol: 'http',  // Ensure protocol is correct (http or https)
+                        nexusUrl: "${NEXUS_URL}",  // Nexus URL
+                        groupId: 'tn.esprit',  // Your project's groupId
+                        version: '0.0.1-SNAPSHOT',  // The version you're deploying
+                        repository: "${NEXUS_REPO}",  // Nexus repository for deployment
+                        credentialsId: "${NEXUS_CREDENTIALS}",  // Credentials for Nexus access
+                        artifacts: [
+                            [artifactId: 'ExamThourayaS2', classifier: '', file: 'target/ExamThourayaS2-0.0.1-SNAPSHOT.jar', type: 'jar'],  // Adjust artifact details
+                            [artifactId: 'ExamThourayaS2', classifier: '', file: 'target/ExamThourayaS2-0.0.1-SNAPSHOT.pom', type: 'pom']  // Ensure POM file is included
+                        ]
+                    )
+                }
+            }
+        }
                 }
             }
         }
