@@ -75,7 +75,7 @@ pipeline {
                         -DartifactId=ExamThourayaS2 \
                         -Dversion=${NEXUS_VERSION} \
                         -Dpackaging=jar \
-                        -Dfile=target/ExamThourayaS2-0.0.1-SNAPSHOT.jar.jar \
+                        -Dfile=target/ExamThourayaS2-0.0.1-SNAPSHOT.jar \
                         -DrepositoryId=nexus-repository \
                         -Durl=${NEXUS_PROTOCOL}://${NEXUS_URL}/repository/${NEXUS_REPOSITORY} \
                         -Dusername=${NEXUS_USER} \
