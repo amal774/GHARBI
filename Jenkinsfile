@@ -71,8 +71,8 @@ pipeline {
                         repository: "${NEXUS_REPOSITORY}",  // Nexus repository for deployment
                         credentialsId: "${NEXUS_CREDENTIALS}",  // Credentials for Nexus access
                         artifacts: [
-                            [artifactId: 'ExamThourayaS2', classifier: '', file: 'target/ExamThourayaS2-${NEXUS_VERSION}-SNAPSHOT.jar', type: 'jar'],  // Adjust artifact details
-                            [artifactId: 'ExamThourayaS2', classifier: '', file: 'target/ExamThourayaS2-${NEXUS_VERSION}-SNAPSHOT.pom', type: 'pom']  // Ensure POM file is included
+                            [artifactId: 'ExamThourayaS2', classifier: '', file: 'target/ExamThourayaS2-0.0.1-SNAPSHOT.jar', type: 'jar'],  // Adjust artifact details
+                            [artifactId: 'ExamThourayaS2', classifier: '', file: 'target/ExamThourayaS2-0.0.1-SNAPSHOT.pom', type: 'pom']  // Ensure POM file is included
                         ]
                     )
                 }
