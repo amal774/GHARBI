@@ -9,7 +9,7 @@ pipeline {
         DOCKER_CREDENTIALS = 'dockerhub-credentials'  // Docker credentials stored in Jenkins
         SONARQUBE_URL = 'http://localhost:9000'  // SonarQube URL
         SONARQUBE_TOKEN = credentials('sonar-token')  // SonarQube token credentials
-        NEXUS_VERSION = '1.0.0'  // Version for Nexus upload
+        NEXUS_VERSION = '0.0.1'  // Version for Nexus upload
         NEXUS_PROTOCOL = 'http'  // Nexus protocol (http or https)
         NEXUS_REPOSITORY = 'nexusproject'  // Nexus repository for deployment
         NEXUS_CREDENTIALS = 'nexus'  // Nexus credentials stored in Jenkins
